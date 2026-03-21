@@ -1,4 +1,19 @@
-export const ItemCard = () => {
+import type {Item} from "../../entities";
+
+export const ItemCard = ({item}: {item: Item}) => {
+    const translateCategory = (category: string): string => {
+        switch(category) {
+            case "auto":
+                return "Авто"
+            case "real_estate":
+                return "недвижимость"
+            case "electronics":
+                return "Электроника"
+            default:
+                return ""
+        }
+    }
+
     return (
         <div className="w-[200px] h-[268px] !bg-[var(--bg-components)]
         border border-[var(--border-neutral)] rounded-[16px]">
@@ -6,14 +21,16 @@ export const ItemCard = () => {
             <div className='flex flex-col gap-1 relative !px-4 !py-[22px]'>
                 <span className='!px-3 absolute top-[-15px] bg-[var(--bg-components)]
                 border border-[var(--border-color)] rounded-[6px]'>
-                    Электроника
+                    {translateCategory(item.category)}
                 </span>
-                <span>Наушники</span>
-                <span>2990 ₽</span>
-                <div className='!py-[2px] !px-2 !bg-[var(--bg-badge)]
-                text-[var(--text-badge)] rounded-[8px]'>
-                    Требует доработок
-                </div>
+                <span>{item.title}</span>
+                <span>{item.price} ₽</span>
+                {item.needsRevision ?
+                    <div className='!py-[2px] !px-2 !bg-[var(--bg-badge)]
+                    text-[var(--text-badge)] rounded-[8px]'>
+                        Требует доработок
+                    </div> : null}
+
             </div>
         </div>
     )

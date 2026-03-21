@@ -1,25 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const {items} = require("./items.ts");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-let items = [
-    {
-        id: 1,
-        category: 'auto',
-        title: 'BMW X5',
-        description: '',
-        price: 10000,
-        params: {
-            brand: 'BMW',
-            model: 'X5'
-        },
-        createdAt: new Date()
-    }
-];
 
 function checkNeedsRevision(item) {
     if (!item.description) return true;

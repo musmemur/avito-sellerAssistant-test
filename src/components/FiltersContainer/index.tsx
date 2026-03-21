@@ -5,7 +5,7 @@ export const FiltersContainer = () => {
     const [isShow, setIsShow] = useState<boolean>(true);
 
     return (
-        <div className='flex flex-col gap-[10px] w-[256px]'>
+        <div className='flex flex-col gap-[10px] w-150'>
             <div className="flex flex-col gap-[10px] !bg-[var(--bg-components)] !p-4">
                 <span>Фильтры</span>
                 <div>
@@ -16,7 +16,7 @@ export const FiltersContainer = () => {
                         <Checkbox>Недвижимость</Checkbox>
                     </div>
                 </div>
-                <div className='flex !items-center'>
+                <div className='flex !items-center gap-5'>
                     <span>Только требующие доработок</span>
                     <Switch/>
                 </div>
