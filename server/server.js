@@ -15,18 +15,45 @@ function checkNeedsRevision(item) {
 }
 
 app.get('/items', (req, res) => {
+    console.log('🔥 REQUEST ПРИШЁЛ');
+    console.log('QUERY:', req.query);
+
     let result = items.map(item => ({
         ...item,
         needsRevision: checkNeedsRevision(item)
     }));
 
-    const { q, limit, skip } = req.query;
+    const {
+        q,
+        limit,
+        skip,
+        needsRevision,
+        categories
+    } = req.query;
 
     if (q) {
         result = result.filter(i =>
             i.title.toLowerCase().includes(q.toLowerCase())
         );
     }
+
+    if (needsRevision === 'true') {
+        result = result.filter(i => i.needsRevision === true);
+    }
+
+    console.log('BEFORE FILTER:', result.length);
+
+    if (categories) {
+        console.log('FILTERING BY:', categories);
+
+        const categoryList = categories.split(',');
+
+        result = result.filter(i =>
+            categoryList.includes(i.category)
+        );
+    }
+
+    console.log('AFTER FILTER:', result.length);
 
     const total = result.length;
 

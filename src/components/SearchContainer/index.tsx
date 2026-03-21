@@ -1,12 +1,8 @@
 import Search from "antd/es/input/Search";
-import type {SearchProps} from "antd/lib/input";
 import {Select, Switch} from "antd";
 import {useState} from "react";
 
-export const SearchContainer = () => {
-    const onSearch: SearchProps["onSearch"] = (value, _e, info) =>
-        console.log(info?.source, value);
-
+export const SearchContainer = ({ setSearch }: { setSearch: (v: string) => void }) => {
     const [sortValue, setSortValue] = useState<string>('titleFromStart')
 
     const options = [
@@ -22,7 +18,7 @@ export const SearchContainer = () => {
         <div className='!bg-[var(--bg-components)] flex items-center gap-6 !p-3 rounded-[8px] !mb-4'>
             <Search
                 placeholder="Найти объявление..."
-                onSearch={onSearch}
+                onChange={(e) => setSearch(e.target.value)}
                 style={{ width: '70%', height: 32 }}
             />
             <div className='flex gap-4 items-center'>
