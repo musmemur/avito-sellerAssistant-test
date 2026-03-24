@@ -26,7 +26,7 @@ export const FiltersContainer = ({ filters, setFilters }: Props) => {
     };
 
     return (
-        <div className='flex flex-col gap-[10px] w-150'>
+        <div className='flex flex-col gap-[10px]'>
             <div className="flex flex-col gap-[10px] !bg-[var(--bg-components)] !p-4">
                 <span>Фильтры</span>
 

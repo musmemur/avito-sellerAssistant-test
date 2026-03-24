@@ -9,32 +9,42 @@ type Filters = {
     categories: string[];
     needsRevision: boolean;
     search: string;
+    sort: string;
 };
 
 export const AdvertsPage = () => {
     const [adverts, setAdverts] = useState<Item[]>([]);
     const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
 
     const [filters, setFilters] = useState<Filters>({
         categories: [],
         needsRevision: false,
         search: "",
+        sort: "titleFromStart",
     });
+
+    const updateFilters = (newPartial: Partial<Filters>) => {
+        setFilters(prev => ({ ...prev, ...newPartial }));
+        setPage(1);
+    };
 
     useEffect(() => {
         getItems({
-            limit: 10,
-            skip: 0,
+            limit: pageSize,
+            skip: (page - 1) * pageSize,
             q: filters.search || undefined,
             needsRevision: filters.needsRevision.toString(),
             categories: filters.categories.length
                 ? filters.categories.join(",")
                 : undefined,
+            sort: filters.sort
         }).then(data => {
             setAdverts(data.items);
             setTotal(data.total);
         });
-    }, [filters]);
+    }, [filters, page]);
 
     return (
         <div className='!my-3 !mx-8'>
@@ -43,16 +53,29 @@ export const AdvertsPage = () => {
                 <div className='text-[18px] text-[var(--text-muted)]'>{total} объявления</div>
             </div>
 
-            <SearchContainer setSearch={(value) =>
-                setFilters(prev => ({ ...prev, search: value }))
-            } />
+            <SearchContainer
+                setSearch={(value) =>
+                    updateFilters({ search: value })
+                }
+                setSort={(value) =>
+                    updateFilters({ sort: value })
+                }
+            />
 
             <main className='flex gap-6'>
                 <FiltersContainer
                     filters={filters}
-                    setFilters={setFilters}
+                    setFilters={(newFilters) => {
+                        setFilters(newFilters);
+                        setPage(1);
+                    }}
                 />
-                <AdvertsContainer adverts={adverts} />
+                <AdvertsContainer
+                    adverts={adverts}
+                    total={total}
+                    page={page}
+                    setPage={setPage}
+                />
             </main>
         </div>
     );

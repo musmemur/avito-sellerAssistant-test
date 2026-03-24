@@ -1,4 +1,5 @@
 import type {Item} from "../../entities";
+import {Link} from "react-router-dom";
 
 export const ItemCard = ({item}: {item: Item}) => {
     const translateCategory = (category: string): string => {
@@ -6,7 +7,7 @@ export const ItemCard = ({item}: {item: Item}) => {
             case "auto":
                 return "Авто"
             case "real_estate":
-                return "недвижимость"
+                return "Недвижимость"
             case "electronics":
                 return "Электроника"
             default:
@@ -15,10 +16,11 @@ export const ItemCard = ({item}: {item: Item}) => {
     }
 
     return (
-        <div className="w-[200px] h-[268px] !bg-[var(--bg-components)]
+        <Link to={`./${item.id}`}
+            className="w-[200px] h-[268px] !bg-[var(--bg-components)]
         border border-[var(--border-neutral)] rounded-[16px]">
             <img src='/src/shared/img/cover.jpg' alt='Card Placeholder' />
-            <div className='flex flex-col gap-1 relative !px-4 !py-[22px]'>
+            <div className='flex flex-col gap-1 relative !px-4 !py-[22px] items-start'>
                 <span className='!px-3 absolute top-[-15px] bg-[var(--bg-components)]
                 border border-[var(--border-color)] rounded-[6px]'>
                     {translateCategory(item.category)}
@@ -32,6 +34,6 @@ export const ItemCard = ({item}: {item: Item}) => {
                     </div> : null}
 
             </div>
-        </div>
+        </Link>
     )
 }

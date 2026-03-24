@@ -1,4 +1,15 @@
-export const items = [
+function randomDate(daysBack = 45) {
+    const now = Date.now();
+    const past = now - daysBack * 24 * 60 * 60 * 1000;
+
+    return new Date(past + Math.random() * (now - past));
+}
+
+function maybe(value, probability = 0.1) {
+    return Math.random() < probability ? undefined : value;
+}
+
+const items = [
     {
         id: 1,
         category: 'electronics',
@@ -6,7 +17,7 @@ export const items = [
         description: '',
         price: 650,
         params: { type: 'phone', brand: 'Apple', model: 'iPhone 13', condition: 'used', color: 'black' },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
     {
         id: 2,
@@ -15,7 +26,7 @@ export const items = [
         description: 'Отличное состояние, полный комплект',
         price: 550,
         params: { type: 'phone', brand: 'Samsung', model: 'S22', condition: 'used', color: 'white' },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
     {
         id: 3,
@@ -24,7 +35,7 @@ export const items = [
         description: '',
         price: 900,
         params: { type: 'laptop', brand: 'Apple', model: 'Air M1', condition: 'used' },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
     {
         id: 4,
@@ -33,7 +44,7 @@ export const items = [
         description: 'Рабочий ноутбук, хорошее состояние',
         price: 700,
         params: { type: 'laptop', brand: 'Lenovo', model: 'X1', condition: 'used', color: 'black' },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
 
     {
@@ -43,7 +54,7 @@ export const items = [
         description: '',
         price: 28000,
         params: { brand: 'BMW', model: 'X5', yearOfManufacture: 2018, transmission: 'automatic', mileage: 90000 },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
     {
         id: 6,
@@ -52,7 +63,7 @@ export const items = [
         description: 'Надежный автомобиль',
         price: 15000,
         params: { brand: 'Toyota', model: 'Camry', yearOfManufacture: 2016, transmission: 'automatic', mileage: 120000 },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
     {
         id: 7,
@@ -61,7 +72,7 @@ export const items = [
         description: '',
         price: 22000,
         params: { brand: 'Audi', model: 'A4', yearOfManufacture: 2019 },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
     {
         id: 8,
@@ -70,7 +81,7 @@ export const items = [
         description: 'Как новая',
         price: 9000,
         params: { brand: 'Lada', model: 'Vesta', yearOfManufacture: 2020, transmission: 'manual' },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
 
     {
@@ -80,7 +91,7 @@ export const items = [
         description: '',
         price: 70000,
         params: { type: 'flat', address: 'Москва', area: 35, floor: 5 },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
     {
         id: 10,
@@ -89,7 +100,7 @@ export const items = [
         description: 'Большой участок',
         price: 150000,
         params: { type: 'house', address: 'Московская область', area: 120 },
-        createdAt: new Date()
+        createdAt: randomDate()
     },
 
     ...Array.from({ length: 40 }, (_, i) => {
@@ -106,13 +117,13 @@ export const items = [
                 description: id % 2 === 0 ? '' : 'Хорошее состояние',
                 price: 5000 + id * 700,
                 params: {
-                    brand: ['BMW', 'Audi', 'Toyota'][id % 3],
-                    model: `Model ${id}`,
-                    yearOfManufacture: 2005 + (id % 15),
-                    transmission: id % 2 === 0 ? 'automatic' : 'manual',
-                    mileage: 50000 + id * 3000
+                    brand: maybe(['BMW', 'Audi', 'Toyota'][id % 3]),
+                    model: maybe(`Model ${id}`),
+                    yearOfManufacture: maybe(2005 + (id % 15)),
+                    transmission: maybe(id % 2 === 0 ? 'automatic' : 'manual'),
+                    mileage: maybe(50000 + id * 3000)
                 },
-                createdAt: new Date()
+                createdAt: randomDate()
             };
         }
 
@@ -124,13 +135,13 @@ export const items = [
                 description: id % 2 === 0 ? '' : 'Отличное состояние',
                 price: 100 + id * 20,
                 params: {
-                    type: id % 2 === 0 ? 'phone' : 'laptop',
-                    brand: ['Apple', 'Samsung', 'Xiaomi'][id % 3],
-                    model: `Model ${id}`,
-                    condition: id % 2 === 0 ? 'new' : 'used',
-                    color: ['black', 'white', 'gray'][id % 3]
+                    type: maybe(id % 2 === 0 ? 'phone' : 'laptop'),
+                    brand: maybe(['Apple', 'Samsung', 'Xiaomi'][id % 3]),
+                    model: maybe(`Model ${id}`),
+                    condition: maybe(id % 2 === 0 ? 'new' : 'used'),
+                    color: maybe(['black', 'white', 'gray'][id % 3])
                 },
-                createdAt: new Date()
+                createdAt: randomDate()
             };
         }
 
@@ -141,12 +152,14 @@ export const items = [
             description: id % 2 === 0 ? '' : 'Хороший вариант',
             price: 30000 + id * 5000,
             params: {
-                type: ['flat', 'house'][id % 2],
-                address: `Город ${id}`,
-                area: 30 + id,
-                floor: id % 10
+                type: maybe(['flat', 'house'][id % 2]),
+                address: maybe(`Город ${id}`),
+                area: maybe(30 + id),
+                floor: maybe(id % 10)
             },
-            createdAt: new Date()
+            createdAt: randomDate()
         };
     })
 ];
+
+module.exports = { items };

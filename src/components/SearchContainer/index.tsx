@@ -2,7 +2,7 @@ import Search from "antd/es/input/Search";
 import {Select, Switch} from "antd";
 import {useState} from "react";
 
-export const SearchContainer = ({ setSearch }: { setSearch: (v: string) => void }) => {
+export const SearchContainer = ({setSearch, setSort}: { setSearch: (v: string) => void; setSort: (v: string) => void; }) => {
     const [sortValue, setSortValue] = useState<string>('titleFromStart')
 
     const options = [
@@ -23,10 +23,14 @@ export const SearchContainer = ({ setSearch }: { setSearch: (v: string) => void 
             />
             <div className='flex gap-4 items-center'>
                 <Switch />
-                <Select value={sortValue}
-                        onChange={(e) => setSortValue(e)}
-                        options={options}
-                        style={{width: 240}}
+                <Select
+                    value={sortValue}
+                    onChange={(value) => {
+                        setSortValue(value);
+                        setSort(value);
+                    }}
+                    options={options}
+                    style={{width: 240}}
                 />
             </div>
         </div>

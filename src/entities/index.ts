@@ -22,7 +22,9 @@ export type ItemUpdateIn = {
     title: string;
     description?: string;
     price: number;
+    createdAt: string;
     params: AutoItemParams | RealEstateItemParams | ElectronicsItemParams;
+    needsRevision: boolean;
 };
 
 export type AutoItemParams = {

@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const {items} = require("./items.ts");
+const {items} = require("./items");
 
 const app = express();
 
@@ -15,9 +15,7 @@ function checkNeedsRevision(item) {
 }
 
 app.get('/items', (req, res) => {
-    console.log('🔥 REQUEST ПРИШЁЛ');
-    console.log('QUERY:', req.query);
-
+    console.log(req.query)
     let result = items.map(item => ({
         ...item,
         needsRevision: checkNeedsRevision(item)
@@ -28,7 +26,8 @@ app.get('/items', (req, res) => {
         limit,
         skip,
         needsRevision,
-        categories
+        categories,
+        sort
     } = req.query;
 
     if (q) {
@@ -41,11 +40,7 @@ app.get('/items', (req, res) => {
         result = result.filter(i => i.needsRevision === true);
     }
 
-    console.log('BEFORE FILTER:', result.length);
-
     if (categories) {
-        console.log('FILTERING BY:', categories);
-
         const categoryList = categories.split(',');
 
         result = result.filter(i =>
@@ -53,7 +48,33 @@ app.get('/items', (req, res) => {
         );
     }
 
-    console.log('AFTER FILTER:', result.length);
+    if (sort) {
+        switch (sort) {
+            case 'titleFromStart':
+                result.sort((a, b) => a.title.localeCompare(b.title));
+                break;
+
+            case 'titleFromEnd':
+                result.sort((a, b) => b.title.localeCompare(a.title));
+                break;
+
+            case 'newStart':
+                result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+
+            case 'oldStart':
+                result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                break;
+
+            case 'cheapStart':
+                result.sort((a, b) => a.price - b.price);
+                break;
+
+            case 'expensiveStart':
+                result.sort((a, b) => b.price - a.price);
+                break;
+        }
+    }
 
     const total = result.length;
 
@@ -66,7 +87,7 @@ app.get('/items', (req, res) => {
 });
 
 app.get('/items/:id', (req, res) => {
-    const item = items.find(i => i.id === req.params.id);
+    const item = items.find(i => i.id === parseInt(req.params.id));
 
     if (!item) return res.status(404).send('Not found');
 
@@ -80,7 +101,7 @@ app.get('/items/:id', (req, res) => {
 });
 
 app.put('/items/:id', (req, res) => {
-    const index = items.findIndex(i => i.id === req.params.id);
+    const index = items.findIndex(i => i.id === parseInt(req.params.id));
 
     if (index === -1) {
         return res.status(404).send('Not found');
@@ -92,6 +113,37 @@ app.put('/items/:id', (req, res) => {
     };
 
     res.json(items[index]);
+});
+
+app.post('/llm/improve-description', async (req, res) => {
+    const { title, category, params, description } = req.body;
+
+    const prompt = `
+Ты помогаешь писать объявления.
+
+Дано:
+Название: ${title}
+Категория: ${category}
+Характеристики: ${JSON.stringify(params)}
+Описание: ${description || 'нет'}
+
+Сделай улучшенное, продающее описание (до 1000 символов) на русском языке.
+`;
+
+    const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'llama3',
+            prompt,
+            stream: false
+        })
+    });
+
+    const data = await response.json();
+    console.log(data)
+
+    res.json({ text: data.response });
 });
 
 const PORT = process.env.PORT || 8080;
