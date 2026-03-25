@@ -104,9 +104,10 @@ export const EditAdvertPage = () => {
         const result = {
             ...values,
             params
-        };
+        } as ItemUpdateIn
 
         try {
+            if(!id) return;
             await updateItem(id, result);
             clearDraft();
             navigate('./..');
