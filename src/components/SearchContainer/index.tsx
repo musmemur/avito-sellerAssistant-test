@@ -15,14 +15,14 @@ export const SearchContainer = ({setSearch, setSort}: { setSearch: (v: string) =
     ]
 
     return (
-        <div className='!bg-[var(--bg-components)] flex items-center gap-6 !p-3 rounded-[8px] !mb-4'>
+        <div className='!bg-[var(--bg-components)] flex justify-between items-center gap-6 !p-3 rounded-[8px] !mb-4'>
             <Search
+                className='bg-[var(--bg-search)] [&_.ant-input]:!bg-inherit [&_.ant-btn]:!bg-inherit
+                [&_.ant-btn]:!border-none [&_.ant-input]:!border-none rounded-[8px]'
                 placeholder="Найти объявление..."
                 onChange={(e) => setSearch(e.target.value)}
-                style={{ width: '70%', height: 32 }}
+                style={{ width: 958, height: 32 }}
             />
-            <div className='flex gap-4 items-center'>
-                <Switch />
                 <Select
                     value={sortValue}
                     onChange={(value) => {
@@ -32,7 +32,6 @@ export const SearchContainer = ({setSearch, setSort}: { setSearch: (v: string) =
                     options={options}
                     style={{width: 240}}
                 />
-            </div>
         </div>
     )
 }

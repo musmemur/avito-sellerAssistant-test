@@ -1,12 +1,14 @@
 :root {
     --bg-color: #F7F5F8;
     --bg-components: #FFFFFF;
+    --bg-search: #F6F6F8;
     --text-muted: #848388;
     --border-color: #D9D9D9;
     --border-neutral: #F0F0F0;
     --bg-badge: #F9F1E6;
     --text-badge: #FAAD14;
-    --btn-save-color: #1890FF;
+    --btn-active-color: #1890FF;
     --bg-llm-color: #F9F1E6;
     --bg-llm-text: #FFA940;
+    --text-neutral: #F3F3F3;
 }

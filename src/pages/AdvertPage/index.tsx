@@ -1,14 +1,18 @@
 import {Link, useParams} from "react-router-dom";
 import {Divider} from "../../shared/svg/Divider.tsx";
-import {Alert} from "antd";
+import { EditOutlined } from '@ant-design/icons';
 import {useEffect, useState} from "react";
 import {getItemById} from "../../processes/getItemById.ts";
 import type {ItemUpdateIn} from "../../entities";
+import {AlertRevisions} from "../../components/AlertRevisions";
+import {translateParameters} from "../../shared/utils/translateParameters.ts";
+import {formatDate} from "../../shared/utils/formatDate.ts";
 
 export const AdvertPage = () => {
     const { id } = useParams<{ id: string }>();
     const [advert, setAdvert] = useState<ItemUpdateIn | null>(null);
-    const [revisions, setRevisions] = useState([]);
+    const [revisions, setRevisions] = useState<string[] | []>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const checkRevision = (obj) => {
         const missing = [];
@@ -21,7 +25,8 @@ export const AdvertPage = () => {
                     walk(o[key], currentPath);
                 } else {
                     if (o[key] === undefined || o[key] === '') {
-                        missing.push(currentPath);
+                        const lastProperty = currentPath.split('.').pop();
+                        missing.push(lastProperty);
                     }
                 }
             }
@@ -32,33 +37,55 @@ export const AdvertPage = () => {
     };
 
     useEffect(() => {
-        if (id) {
-            getItemById(id).then(data => {
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                if (!id) {
+                    setAdvert(null);
+                    return;
+                }
+                const data = await getItemById(id);
+                if (!data) {
+                    setAdvert(null);
+                    return;
+                }
                 setAdvert(data);
-
                 if (data.needsRevision) {
                     checkRevision(data);
                 }
-            });
-        }
+            } catch {
+                setAdvert(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
     }, [id]);
 
-    if (!advert) {
+    if (isLoading) {
         return <div>Загрузка...</div>;
+    }
+
+    if (!advert) {
+        return <div>Ошибка: объявление не найдено</div>;
     }
 
     return (
         <div className='!p-8 !bg-[var(--bg-components)] min-h-[100vh] flex flex-col gap-8'>
             <div className="flex flex-col gap-3">
                 <div className='flex justify-between'>
-                    <span>{advert.title}</span>
-                    <span>{advert.price} ₽</span>
+                    <span className='font-semibold opacity-85 text-[30px]'>{advert.title}</span>
+                    <span className='font-semibold opacity-85 text-[30px]'>{advert.price} ₽</span>
                 </div>
                 <div className='flex justify-between'>
-                    <Link to='./edit'>Редактировать</Link>
-                    <div className="flex flex-col">
-                        <span>Опубликовано: {advert.createdAt}</span>
-                        <span>Отредактировано: 10 марта 23:12</span>
+                    <Link to='./edit'
+                          className='flex gap-2 items-center h-[38px] bg-[var(--btn-active-color)]
+                          text-[var(--text-neutral)] rounded-[8px] !py-2 !px-3'>
+                        <span>Редактировать</span>
+                        <EditOutlined />
+                    </Link>
+                    <div className="flex flex-col text-[var(--text-muted)]">
+                        <span>Опубликовано: {formatDate(advert.createdAt)}</span>
                     </div>
                 </div>
             </div>
@@ -67,21 +94,20 @@ export const AdvertPage = () => {
                 <img className='w-[480px]' src='/src/shared/img/cover.jpg' alt='Image placeholder' />
                 <div className='flex flex-col gap-9 w-[512px]'>
                     {revisions.length > 0 &&
-                        <Alert title={<>
-                            <div>Требуются доработки</div>
-                            <div>У объявления не заполнены поля:</div>
-                            <ul>
-                                {revisions.map((revision, index) => (<li key={index}>{revision}</li>))}
-                            </ul>
-                        </>} type="warning" showIcon/>
+                        <AlertRevisions revisions={revisions} />
                     }
                     <div className='flex gap-4 flex-col'>
-                        <span>Характеристики</span>
-                        <div className='flex flex-col gap-[6px] [&_>div]:flex [&_>div]:justify-between'>
+                        <span className='text-[22px] font-medium'>Характеристики</span>
+                        <div className='flex flex-col [&_>div]:flex [&_>div]:justify-between'>
                             {Object.entries(advert.params).map(([key, value]) => (
                                 <div key={key}>
-                                    <span>{key}</span>
-                                    <span>{value}</span>
+                                    <span className='opacity-45 font-semibold capitalize'>
+                                        {translateParameters(key)}
+                                    </span>
+                                    <span className='capitalize'>
+                                        {value ? translateParameters(String(value)) :
+                                            <span className='opacity-45 italic lowercase'>не указано</span>}
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -89,9 +115,9 @@ export const AdvertPage = () => {
                 </div>
 
             </div>
-            <p className='flex flex-col gap-4 w-[480px]'>
-                <span>Описание</span>
-                <span>{advert.description}</span>
+            <p className='flex flex-col gap-3 w-[480px]'>
+                <span className='text-[22px] font-medium'>Описание</span>
+                <span>{advert.description || <span className='opacity-45 italic'>пока нет описания</span>}</span>
             </p>
         </div>
     );

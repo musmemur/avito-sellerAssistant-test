@@ -47,9 +47,9 @@ export const AdvertsPage = () => {
     }, [filters, page]);
 
     return (
-        <div className='!my-3 !mx-8'>
+        <div className='!my-6 !mx-10'>
             <div className="pl-2 !mb-4">
-                <h1 className='text-[22px] opacity-85'>Мои объявления</h1>
+                <h1 className='text-[22px] opacity-85 font-medium'>Мои объявления</h1>
                 <div className='text-[18px] text-[var(--text-muted)]'>{total} объявления</div>
             </div>
 

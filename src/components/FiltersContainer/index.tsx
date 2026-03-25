@@ -1,4 +1,5 @@
-import {Checkbox, Switch} from "antd";
+import {Checkbox, Divider, Switch} from "antd";
+import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import React, {useState} from "react";
 
 type Props = {
@@ -10,7 +11,7 @@ type Props = {
 };
 
 export const FiltersContainer = ({ filters, setFilters }: Props) => {
-    const [isShow, setIsShow] = useState(true);
+    const [isShow, setIsShow] = useState(false);
 
     const toggleCategory = (category: string) => {
         setFilters(prev => {
@@ -26,13 +27,13 @@ export const FiltersContainer = ({ filters, setFilters }: Props) => {
     };
 
     return (
-        <div className='flex flex-col gap-[10px]'>
+        <div className='flex flex-col gap-[10px] !w-[256px]'>
             <div className="flex flex-col gap-[10px] !bg-[var(--bg-components)] !p-4">
-                <span>Фильтры</span>
+                <span className='font-medium'>Фильтры</span>
 
                 <div>
-                    <button onClick={() => setIsShow(!isShow)}>
-                        Категория
+                    <button onClick={() => setIsShow(!isShow)} className='w-full flex justify-between'>
+                        <span>Категория</span> {isShow ? <UpOutlined className='opacity-85' /> : <DownOutlined className='opacity-85' />}
                     </button>
 
                     <div className={`${isShow ? 'flex flex-col gap-2 !py-2' : 'hidden'}`}>
@@ -58,9 +59,9 @@ export const FiltersContainer = ({ filters, setFilters }: Props) => {
                         </Checkbox>
                     </div>
                 </div>
-
+                <Divider  className='!my-0'/>
                 <div className='flex items-center gap-5'>
-                    <span>Только требующие доработок</span>
+                    <span className='font-semibold opacity-85'>Только требующие доработок</span>
                     <Switch
                         checked={filters.needsRevision}
                         onChange={(checked) =>
@@ -72,9 +73,8 @@ export const FiltersContainer = ({ filters, setFilters }: Props) => {
                     />
                 </div>
             </div>
-
             <button
-                className='bg-[var(--bg-components)] !py-3 rounded-[8px]'
+                className='bg-[var(--bg-components)] !py-3 rounded-[8px] text-[var(--text-muted)]'
                 onClick={() =>
                     setFilters({
                         categories: [],
