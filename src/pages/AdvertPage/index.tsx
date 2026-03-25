@@ -1,5 +1,4 @@
 import {Link, useParams} from "react-router-dom";
-import {Divider} from "../../shared/svg/Divider.tsx";
 import { EditOutlined } from '@ant-design/icons';
 import {useEffect, useState} from "react";
 import {getItemById} from "../../processes/getItemById.ts";
@@ -7,6 +6,7 @@ import type {ItemUpdateIn} from "../../entities";
 import {AlertRevisions} from "../../components/AlertRevisions";
 import {translateParameters} from "../../shared/utils/translateParameters.ts";
 import {formatDate} from "../../shared/utils/formatDate.ts";
+import {Divider} from "antd";
 
 export const AdvertPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -90,7 +90,7 @@ export const AdvertPage = () => {
                     </div>
                 </div>
             </div>
-            <Divider />
+            <Divider className='!m-0' />
             <div className='flex gap-8'>
                 <img className='w-[480px]' src='/src/shared/img/cover.jpg' alt='Image placeholder' />
                 <div className='flex flex-col gap-9 w-[512px]'>
