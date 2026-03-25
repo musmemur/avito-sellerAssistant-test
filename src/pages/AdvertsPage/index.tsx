@@ -1,50 +1,43 @@
-import {SearchContainer} from "../../components/SearchContainer";
-import {FiltersContainer} from "../../components/FiltersContainer";
-import {AdvertsContainer} from "../../components/AdvertsContainer";
-import {useEffect, useState} from "react";
-import type {Item} from "../../entities";
+import { SearchContainer } from "../../components/SearchContainer";
+import { FiltersContainer } from "../../components/FiltersContainer";
+import { AdvertsContainer } from "../../components/AdvertsContainer";
+import {useEffect, useMemo} from "react";
+import {resetPage, setAdverts} from "../../app/slices/advertsSlice";
+import {useDispatch, useSelector} from "react-redux";
 import {getItems} from "../../processes/getItems.ts";
-
-type Filters = {
-    categories: string[];
-    needsRevision: boolean;
-    search: string;
-    sort: string;
-};
+import {resetFilters} from "../../app/slices/filtersSlice.ts";
 
 export const AdvertsPage = () => {
-    const [adverts, setAdverts] = useState<Item[]>([]);
-    const [total, setTotal] = useState(0);
-    const [page, setPage] = useState(1);
-    const pageSize = 10;
+    const dispatch = useDispatch();
+    const { items: adverts, total, page } = useSelector(state => state.adverts);
+    const filters = useSelector(state => state.filters);
 
-    const [filters, setFilters] = useState<Filters>({
-        categories: [],
-        needsRevision: false,
-        search: "",
-        sort: "titleFromStart",
-    });
-
-    const updateFilters = (newPartial: Partial<Filters>) => {
-        setFilters(prev => ({ ...prev, ...newPartial }));
-        setPage(1);
-    };
+    const params = useMemo(() => ({
+        limit: 10,
+        skip: (page - 1) * 10,
+        q: filters.search || undefined,
+        needsRevision: filters.needsRevision.toString(),
+        categories: filters.categories.length
+            ? filters.categories.join(',')
+            : undefined,
+        sort: filters.sort,
+    }), [page, filters]);
 
     useEffect(() => {
-        getItems({
-            limit: pageSize,
-            skip: (page - 1) * pageSize,
-            q: filters.search || undefined,
-            needsRevision: filters.needsRevision.toString(),
-            categories: filters.categories.length
-                ? filters.categories.join(",")
-                : undefined,
-            sort: filters.sort
-        }).then(data => {
-            setAdverts(data.items);
-            setTotal(data.total);
+        getItems(params).then(data => {
+            dispatch(setAdverts(data));
         });
-    }, [filters, page]);
+    }, [dispatch, filters, page, params]);
+
+    useEffect(() => {
+        dispatch(resetPage());
+    }, [filters, dispatch]);
+
+    useEffect(() => {
+        return () => {
+            dispatch(resetFilters());
+        }
+    }, [dispatch]);
 
     return (
         <div className='!my-6 !mx-10'>
@@ -53,28 +46,14 @@ export const AdvertsPage = () => {
                 <div className='text-[18px] text-[var(--text-muted)]'>{total} объявления</div>
             </div>
 
-            <SearchContainer
-                setSearch={(value) =>
-                    updateFilters({ search: value })
-                }
-                setSort={(value) =>
-                    updateFilters({ sort: value })
-                }
-            />
+            <SearchContainer />
 
             <main className='flex gap-6'>
-                <FiltersContainer
-                    filters={filters}
-                    setFilters={(newFilters) => {
-                        setFilters(newFilters);
-                        setPage(1);
-                    }}
-                />
+                <FiltersContainer />
                 <AdvertsContainer
                     adverts={adverts}
                     total={total}
                     page={page}
-                    setPage={setPage}
                 />
             </main>
         </div>

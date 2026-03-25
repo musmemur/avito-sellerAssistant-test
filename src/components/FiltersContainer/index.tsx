@@ -1,29 +1,24 @@
-import {Checkbox, Divider, Switch} from "antd";
+import { Checkbox, Divider, Switch } from "antd";
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
-import React, {useState} from "react";
+import {useEffect, useState} from "react";
+import { toggleCategory, setNeedsRevision, resetFilters } from "../../app/slices/filtersSlice";
+import {useDispatch, useSelector} from "react-redux";
 
-type Props = {
-    filters: {
-        categories: string[];
-        needsRevision: boolean;
-    };
-    setFilters: React.Dispatch<React.SetStateAction<any>>;
-};
-
-export const FiltersContainer = ({ filters, setFilters }: Props) => {
+export const FiltersContainer = () => {
+    const dispatch = useDispatch();
     const [isShow, setIsShow] = useState(false);
+    const { categories, needsRevision } = useSelector(state => state.filters);
 
-    const toggleCategory = (category: string) => {
-        setFilters(prev => {
-            const exists = prev.categories.includes(category);
+    const handleToggleCategory = (category: string) => {
+        dispatch(toggleCategory(category));
+    };
 
-            return {
-                ...prev,
-                categories: exists
-                    ? prev.categories.filter((c: string) => c !== category)
-                    : [...prev.categories, category],
-            };
-        });
+    const handleNeedsRevisionChange = (checked: boolean) => {
+        dispatch(setNeedsRevision(checked));
+    };
+
+    const handleResetFilters = () => {
+        dispatch(resetFilters());
     };
 
     return (
@@ -33,55 +28,48 @@ export const FiltersContainer = ({ filters, setFilters }: Props) => {
 
                 <div>
                     <button onClick={() => setIsShow(!isShow)} className='w-full flex justify-between'>
-                        <span>Категория</span> {isShow ? <UpOutlined className='opacity-85' /> : <DownOutlined className='opacity-85' />}
+                        <span>Категория</span>
+                        {isShow ? <UpOutlined className='opacity-85' /> : <DownOutlined className='opacity-85' />}
                     </button>
 
                     <div className={`${isShow ? 'flex flex-col gap-2 !py-2' : 'hidden'}`}>
                         <Checkbox
-                            checked={filters.categories.includes("auto")}
-                            onChange={() => toggleCategory("auto")}
+                            checked={categories.includes("auto")}
+                            onChange={() => handleToggleCategory("auto")}
                         >
                             Авто
                         </Checkbox>
 
                         <Checkbox
-                            checked={filters.categories.includes("electronics")}
-                            onChange={() => toggleCategory("electronics")}
+                            checked={categories.includes("electronics")}
+                            onChange={() => handleToggleCategory("electronics")}
                         >
                             Электроника
                         </Checkbox>
 
                         <Checkbox
-                            checked={filters.categories.includes("real_estate")}
-                            onChange={() => toggleCategory("real_estate")}
+                            checked={categories.includes("real_estate")}
+                            onChange={() => handleToggleCategory("real_estate")}
                         >
                             Недвижимость
                         </Checkbox>
                     </div>
                 </div>
-                <Divider  className='!my-0'/>
+
+                <Divider className='!my-0'/>
+
                 <div className='flex items-center gap-5'>
                     <span className='font-semibold opacity-85'>Только требующие доработок</span>
                     <Switch
-                        checked={filters.needsRevision}
-                        onChange={(checked) =>
-                            setFilters(prev => ({
-                                ...prev,
-                                needsRevision: checked,
-                            }))
-                        }
+                        checked={needsRevision}
+                        onChange={handleNeedsRevisionChange}
                     />
                 </div>
             </div>
+
             <button
                 className='bg-[var(--bg-components)] !py-3 rounded-[8px] text-[var(--text-muted)]'
-                onClick={() =>
-                    setFilters({
-                        categories: [],
-                        needsRevision: false,
-                        search: "",
-                    })
-                }
+                onClick={handleResetFilters}
             >
                 Сбросить фильтры
             </button>
