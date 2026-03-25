@@ -6,7 +6,7 @@ function randomDate(daysBack = 45) {
 }
 
 function maybe(value, probability = 0.1) {
-    return Math.random() < probability ? undefined : value;
+    return Math.random() < probability ? null : value;
 }
 
 const items = [
@@ -121,7 +121,8 @@ const items = [
                     model: maybe(`Model ${id}`),
                     yearOfManufacture: maybe(2005 + (id % 15)),
                     transmission: maybe(id % 2 === 0 ? 'automatic' : 'manual'),
-                    mileage: maybe(50000 + id * 3000)
+                    mileage: maybe(50000 + id * 3000),
+                    enginePower: maybe(500)
                 },
                 createdAt: randomDate()
             };
@@ -139,7 +140,7 @@ const items = [
                     brand: maybe(['Apple', 'Samsung', 'Xiaomi'][id % 3]),
                     model: maybe(`Model ${id}`),
                     condition: maybe(id % 2 === 0 ? 'new' : 'used'),
-                    color: maybe(['black', 'white', 'gray'][id % 3])
+                    color: maybe(['чёрный', 'белый', 'серый'][id % 3])
                 },
                 createdAt: randomDate()
             };
