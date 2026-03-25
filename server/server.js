@@ -15,7 +15,6 @@ function checkNeedsRevision(item) {
 }
 
 app.get('/items', (req, res) => {
-    console.log(req.query)
     let result = items.map(item => ({
         ...item,
         needsRevision: checkNeedsRevision(item)
@@ -141,9 +140,37 @@ app.post('/llm/improve-description', async (req, res) => {
     });
 
     const data = await response.json();
-    console.log(data)
 
     res.json({ text: data.response });
+});
+
+app.post('/llm/estimate-price', async (req, res) => {
+    const { title, category, params } = req.body;
+
+    const prompt = `
+Ты оцениваешь товары.
+
+Дано:
+Название: ${title}
+Категория: ${category}
+Характеристики: ${JSON.stringify(params)}
+
+Назови примерную рыночную цену в рублях (только число).
+`;
+
+    const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'llama3',
+            prompt,
+            stream: false
+        })
+    });
+
+    const data = await response.json();
+
+    res.json({ price: data.response });
 });
 
 const PORT = process.env.PORT || 8080;
