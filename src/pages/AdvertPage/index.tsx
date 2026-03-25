@@ -14,19 +14,20 @@ export const AdvertPage = () => {
     const [revisions, setRevisions] = useState<string[] | []>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const checkRevision = (obj) => {
-        const missing = [];
+    const checkRevision = (obj: ItemUpdateIn) => {
+        const missing: string[] = [];
 
-        const walk = (o, path = '') => {
+        const walk = (o: Record<string, unknown>, path = '') => {
             for (const key in o) {
                 const currentPath = path ? `${path}.${key}` : key;
+                const value = o[key];
 
-                if (typeof o[key] === 'object' && o[key] !== null) {
-                    walk(o[key], currentPath);
+                if (typeof value === 'object' && value !== null) {
+                    walk(value as Record<string, unknown>, currentPath);
                 } else {
-                    if (o[key] === undefined || o[key] === '') {
+                    if (value === null || value === '') {
                         const lastProperty = currentPath.split('.').pop();
-                        missing.push(lastProperty);
+                        missing.push(lastProperty!);
                     }
                 }
             }

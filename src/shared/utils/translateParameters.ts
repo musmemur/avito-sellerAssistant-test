@@ -24,6 +24,8 @@ export const translateParameters = (parameter: string) => {
             return 'коробка'
         case 'mileage':
             return 'пробег'
+        case 'enginePower':
+            return 'мощность двигателя'
         case 'address':
             return 'адрес'
         case 'flat':
@@ -40,6 +42,12 @@ export const translateParameters = (parameter: string) => {
             return 'площадь'
         case 'floor':
             return 'этаж'
+        case 'auto':
+            return 'авто'
+        case 'electronics':
+            return 'электроника'
+        case 'real_estate':
+            return 'недвижимость'
         default:
             return parameter
     }

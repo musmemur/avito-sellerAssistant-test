@@ -1,13 +1,16 @@
 import { Checkbox, Divider, Switch } from "antd";
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import { toggleCategory, setNeedsRevision, resetFilters } from "../../app/slices/filtersSlice";
 import {useDispatch, useSelector} from "react-redux";
+import type {RootState} from "../../app/store.ts";
+import {translateParameters} from "../../shared/utils/translateParameters.ts";
 
 export const FiltersContainer = () => {
     const dispatch = useDispatch();
     const [isShow, setIsShow] = useState(false);
-    const { categories, needsRevision } = useSelector(state => state.filters);
+    const { categories, needsRevision } = useSelector((state: RootState) => state.filters);
+    const allCategories = ['auto', 'electronics', 'real_estate']
 
     const handleToggleCategory = (category: string) => {
         dispatch(toggleCategory(category));
@@ -33,26 +36,13 @@ export const FiltersContainer = () => {
                     </button>
 
                     <div className={`${isShow ? 'flex flex-col gap-2 !py-2' : 'hidden'}`}>
-                        <Checkbox
-                            checked={categories.includes("auto")}
-                            onChange={() => handleToggleCategory("auto")}
-                        >
-                            Авто
-                        </Checkbox>
-
-                        <Checkbox
-                            checked={categories.includes("electronics")}
-                            onChange={() => handleToggleCategory("electronics")}
-                        >
-                            Электроника
-                        </Checkbox>
-
-                        <Checkbox
-                            checked={categories.includes("real_estate")}
-                            onChange={() => handleToggleCategory("real_estate")}
-                        >
-                            Недвижимость
-                        </Checkbox>
+                        {allCategories.map((category) =>
+                            <Checkbox checked={categories.includes(category)}
+                                      onChange={() => handleToggleCategory(category)}
+                            >
+                                <span className='capitalize'>{translateParameters(category)}</span>
+                            </Checkbox>
+                        )}
                     </div>
                 </div>
 

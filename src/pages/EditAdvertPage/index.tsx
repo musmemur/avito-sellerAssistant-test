@@ -1,9 +1,12 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {Divider, Form, Input, Select, Spin, Tooltip} from "antd";
 import { BulbOutlined } from '@ant-design/icons';
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {getItemById} from "../../processes/getItemById.ts";
-import type {ItemUpdateIn} from "../../entities";
+import type {
+    ItemUpdateIn,
+    MainItemValues
+} from "../../entities";
 import {updateItem} from "../../processes/updateItem.ts";
 import TextArea from "antd/es/input/TextArea";
 import {improveDescription} from "../../processes/improveDescription.ts";
@@ -18,6 +21,8 @@ const paramsConfig = {
                 { value: "automatic", label: "Автомат" },
                 { value: "manual", label: "Механика" }
             ]}/> },
+        { name: "mileage", label: "Прогон", component: <Input allowClear /> },
+        { name: "enginePower", label: "Мощность двигателя", component: <Input allowClear /> },
     ],
     real_estate: [
         { name: "type", label: "Тип", component: <Select options={[
@@ -26,6 +31,8 @@ const paramsConfig = {
                 { value: "room", label: "Комната" }
             ]}/> },
         { name: "address", label: "Адрес", component: <Input allowClear /> },
+        { name: "area", label: "Площадь", component: <Input allowClear /> },
+        { name: "floor", label: "Этаж", component: <Input allowClear /> },
     ],
     electronics: [
         { name: "type", label: "Тип", component: <Select options={[
@@ -54,7 +61,7 @@ export const EditAdvertPage = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
-    const saveDraft = (values: any) => {
+    const saveDraft = (values: object) => {
         if (!id) return;
         const draft = {
             ...values,
@@ -63,35 +70,35 @@ export const EditAdvertPage = () => {
         localStorage.setItem(`${DRAFT_KEY}${id}`, JSON.stringify(draft));
     };
 
-    const loadDraft = (): any | null => {
-        if (!id) return null;
-        const draftStr = localStorage.getItem(`${DRAFT_KEY}${id}`);
-        if (draftStr) {
-            try {
-                return JSON.parse(draftStr);
-            } catch {
-                return null;
+    const loadDraft = useCallback((): { savedAt: string } | null => {
+            if (!id) return null;
+            const draftStr = localStorage.getItem(`${DRAFT_KEY}${id}`);
+            if (draftStr) {
+                try {
+                    return JSON.parse(draftStr);
+                } catch {
+                    return null;
+                }
             }
-        }
-        return null;
-    };
+            return null;
+    }, [id]) 
 
     const clearDraft = () => {
         if (!id) return;
         localStorage.removeItem(`${DRAFT_KEY}${id}`);
     };
 
-    const handleValuesChange = (changedValues: any, allValues: any) => {
+    const handleValuesChange = (allValues: object) => {
         saveDraft(allValues);
     };
 
-    const onFinish = async (values) => {
-        const paramFields = paramsConfig[advert.category].map(f => f.name);
+    const onFinish = async (values: MainItemValues) => {
+        const paramFields = paramsConfig[advert!.category].map(f => f.name);
+        const params: Record<string, unknown> = {};
 
-        const params = {};
         paramFields.forEach(field => {
-            params[field] = values[field];
-            delete values[field];
+            params[field] = values[field as keyof MainItemValues];
+            delete (values as any)[field];
         });
 
         const result = {
@@ -101,8 +108,7 @@ export const EditAdvertPage = () => {
 
         try {
             await updateItem(id, result);
-            clearDraft(); // Удаляем черновик после успешного сохранения
-            console.log("updated");
+            clearDraft();
             navigate('./..');
         } catch (error) {
             console.error("Ошибка при сохранении:", error);
@@ -152,7 +158,7 @@ export const EditAdvertPage = () => {
         };
 
         fetchData();
-    }, [id]);
+    }, [form, id, loadDraft]);
 
     const handleImprove = async () => {
         setImproving(true);
@@ -161,7 +167,6 @@ export const EditAdvertPage = () => {
 
             const text = await improveDescription({
                 ...values,
-                params: extractParams(values)
             });
 
             form.setFieldValue('description', text);
@@ -177,28 +182,14 @@ export const EditAdvertPage = () => {
         setPriceImproving(true);
         try {
             const values = form.getFieldsValue();
-
             const price = await estimatePrice({
-                ...values,
-                params: extractParams(values)
+                ...values
             });
 
             setAiPrice(price);
         } finally {
             setPriceImproving(false);
         }
-    };
-
-    const extractParams = (values) => {
-        if (!advert) return {};
-        const paramFields = paramsConfig[advert.category].map(f => f.name);
-
-        const params = {};
-        paramFields.forEach(field => {
-            params[field] = values[field];
-        });
-
-        return params;
     };
 
     const categories = [{label: 'Электроника', value: 'electronics'},

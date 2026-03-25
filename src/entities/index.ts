@@ -27,6 +27,8 @@ export type ItemUpdateIn = {
     needsRevision: boolean;
 };
 
+export type AllItemParams = AutoItemParams | RealEstateItemParams | ElectronicsItemParams;
+
 export type AutoItemParams = {
     brand?: string;
     model?: string;
@@ -51,3 +53,15 @@ export type ElectronicsItemParams = {
     color?: string;
 };
 
+export type MainItemValues = {
+    category: "auto" | "real_estate" | "electronics";
+    title: string;
+    price: number;
+    description?: string;
+}
+
+export type RealEstateItemCreate = Omit<ItemUpdateIn, 'needsRevision' | 'createdAt' | 'params'> & RealEstateItemParams;
+
+export type ElectronicsItemCreate = Omit<ItemUpdateIn, 'needsRevision' | 'createdAt' | 'params'> & ElectronicsItemParams;
+
+export type AutoItemCreate = Omit<ItemUpdateIn, 'needsRevision' | 'createdAt' | 'params'> & AutoItemParams;

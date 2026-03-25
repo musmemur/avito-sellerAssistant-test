@@ -3,10 +3,11 @@ import { Select } from "antd";
 import { setSearch, setSort } from "../../app/slices/filtersSlice";
 import { useDispatch, useSelector } from "react-redux";
 import React from "react";
+import type {RootState} from "../../app/store.ts";
 
 export const SearchContainer = () => {
     const dispatch = useDispatch();
-    const { search, sort } = useSelector(state => state.filters);
+    const { search, sort } = useSelector((state: RootState) => state.filters);
 
     const options = [
         { label: "По названию (А -> Я)", value: "titleFromStart" },

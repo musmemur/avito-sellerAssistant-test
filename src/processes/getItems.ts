@@ -1,7 +1,16 @@
 import {api} from "../app/axiosInstance.ts";
 import type {ItemsGetOut} from "../entities";
 
-export const getItems = async (params: any): Promise<ItemsGetOut> => {
+type ParamsProps = {
+    q?: string,
+    limit: number,
+    skip: number,
+    needsRevision: string,
+    categories?: string,
+    sort: string
+}
+
+export const getItems = async (params: ParamsProps): Promise<ItemsGetOut> => {
     const response = await api.get('/items', {
         params: {
             q: params.q,

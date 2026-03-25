@@ -6,11 +6,12 @@ import {resetPage, setAdverts} from "../../app/slices/advertsSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {getItems} from "../../processes/getItems.ts";
 import {resetFilters} from "../../app/slices/filtersSlice.ts";
+import type {RootState} from "../../app/store.ts";
 
 export const AdvertsPage = () => {
     const dispatch = useDispatch();
-    const { items: adverts, total, page } = useSelector(state => state.adverts);
-    const filters = useSelector(state => state.filters);
+    const { items: adverts, total, page } = useSelector((state: RootState) => state.adverts);
+    const filters = useSelector((state: RootState) => state.filters);
 
     const params = useMemo(() => ({
         limit: 10,
